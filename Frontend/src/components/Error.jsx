@@ -5,7 +5,7 @@ const Error = () => {
   const error = useRouteError();
   return (
     <div>
-      <h1>{error}</h1>
+      <h1>Error</h1>
     </div>
   );
 }

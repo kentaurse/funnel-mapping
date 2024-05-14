@@ -1,8 +1,8 @@
 :root {
-  --toastify-color-light: #ffffff;
-  --toastify-color-dark: #141414;
-  --toastify-color-info: #1677FF;
-  --toastify-color-success: #52C41A;
-  --toastify-color-warning: #FAAD14;
-  --toastify-color-error: #FF4D4F;
+  --toastify-color-light: #fff;
+  --toastify-color-dark: #121212;
+  --toastify-color-info: #3498db;
+  --toastify-color-success: #0fb315;
+  --toastify-color-warning: #f1c40f;
+  --toastify-color-error: #e74c3c;
 }

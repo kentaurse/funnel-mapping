@@ -28,7 +28,7 @@ const ThemeProvider = ({ children }) => {
     ...commonComponents,
     algorithm: antdTheme.darkAlgorithm,
     token: {
-      // colorBgBase: '#202836',
+      colorBgBase: '#202836',
     }
   } : {
     ...commonComponents,

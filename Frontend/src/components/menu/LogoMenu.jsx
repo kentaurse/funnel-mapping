@@ -20,7 +20,7 @@ const LogoMenu = ({ children }) => {
     { 
       key: '1', 
       label: (
-        <div className='px-5'>
+        <div className='px-5 select-none'>
           <div className='flex flex-col justify-start'>
             <div>{userName}</div>
             <div className='text-[#6d6d6d]'>{userEmail}</div>
@@ -53,14 +53,14 @@ const LogoMenu = ({ children }) => {
       label: (
       <button className='flex gap-1 px-5' onClick={onLogOut}>
         <MdOutlineLogout className='text-[25px] text-[#08c]'/>
-        LogOut
+        ログアウト
       </button>
       ) 
     }
   ];
 
   return (
-    <Dropdown menu={{ items: items }} trigger={['click']} placement="bottomLeft" arrow>
+    <Dropdown className='select-none' menu={{ items: items }} trigger={['click']} placement="bottomLeft" arrow>
       {children}
     </Dropdown>
   )

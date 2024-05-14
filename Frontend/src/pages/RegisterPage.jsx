@@ -14,6 +14,7 @@ const RegisterPage = () => {
     if (email.current.input.value && password.current.input.value) {
       if (password.current.input.value !== conformPass.current.input.value) {
         alert('error');
+        Notification('Incorrect Password!', 'error');
         return false;
       }
       const res = await axios.post("/register", {
@@ -22,7 +23,7 @@ const RegisterPage = () => {
         password: password.current.input.value,
       });
       if(res.status == 200) {
-        alert('successful.');
+        Notification('Successful Register!');
         navigate("/login");
       }
     }
@@ -40,7 +41,7 @@ const RegisterPage = () => {
         <Input.Password ref={password} />
         <Input.Password ref={conformPass} />
         <Checkbox>Remember me</Checkbox>
-        <div className="flex justify-center gap-5 mb-10">
+        <div className="flex justify-center gap-5 pb-10">
           <Button
             type="link"
             className="border-none"

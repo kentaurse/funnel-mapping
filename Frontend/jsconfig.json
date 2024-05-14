@@ -2,8 +2,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "src/*": ["./src/*"]
-    },
-    "skipLibCheck": true
-  }
+      "src/*": ["./src/*"],
+    }
+  },
+  "include": ["vite.config.js"]
 }
