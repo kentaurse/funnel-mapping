@@ -3,47 +3,21 @@
 @tailwind utilities;
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  --colorPrimary: #1677FF;
-  --colorSuccess: #52C41A;
-  --colorWarning: #FAAD14;
-  --colorError: #FF4D4F;
-  --colorLink: #1668DC;
-
-  --base-100: #ffffff;
-  --base-200: #fafafa;
-  --base-300: #f5f5f5;
-  --base-400: #f4f4f4;
-  --base-500: #f3f3f3;
-  --base-600: #f2f2f2;
-  --base-700: #f1f1f1;
-  --base-800: #f0f0f0;
-  --base-900: #efefef;
-  --text-100: #000000;
-  --text-200: #363636;
-  --text-300: #666666;
+  --base-100: #c9c9c9;
+  --base-200: #ffffff;
+  --base-300: #fdffe6;
+  --base-400: #ffffff;
+  --base-500: #a1a1a1;
+  --text: #000000;
 }
 
 .dark {
-  --base-100: #141414;
-  --base-200: #1d1d1d;
-  --base-300: #262626;
-  --base-400: #363636;
-  --base-500: #464646;
-  --base-600: #565656;
-  --base-700: #666666;
-  --base-800: #767676;
-  --text-100: #ffffff;
-  --text-200: #f4f4f4;
-  --text-300: #f1f1f1;
+  --base-100: #424b5b;
+  --base-200: #313a4f;
+  --base-300: #202836;
+  --base-400: #131726;
+  --base-500: #5c606d;
+  --text: #ffffff;
 }
 
 * {
@@ -53,19 +27,38 @@
 }
 
 body {
-  min-width: 320px;
-  min-height: 100vh;
-  background-color: var(--base-100);
-  color: var(--text-100);
+  background-color: var(--base-300);
+  color: var(--text);
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+h2 {
+  @apply text-[20px]
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+.long-text {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+ul.ant-menu {
+  border-inline-end: 0px !important;
 }
 
 ::-webkit-scrollbar {
-  width: 10px; /* Width of the scrollbar */
+  width: 7px; /* Width of the scrollbar */
 }
 
 ::-webkit-scrollbar-track {
@@ -75,26 +68,4 @@ h1 {
 ::-webkit-scrollbar-thumb {
   background: #888; /* Color of the thumb */
   border-radius: 5px; /* Roundness of the thumb */
-}
-
-@layer utilities {
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-}
-
-ul.ant-menu {
-  border-inline-end: 0px !important;
-}
-
-.long-text {
-  display: inline-block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }

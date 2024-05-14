@@ -5,7 +5,8 @@ axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
 const tokenLogin = async () => {
   try {
-    return await axios.get('/tokenLogin');
+    const res = await axios.get('/tokenLogin');
+    return res;
   } catch (error) {
     return error;
   }
