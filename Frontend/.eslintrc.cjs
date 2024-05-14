@@ -14,6 +14,9 @@ module.exports = {
   rules: {
     'no-unused-vars': 0,
     'react/jsx-no-target-blank': 'off',
-    "react-refresh/only-export-components": ["error", { "ignoreNamedExports": ["ok"] }]
+    'react-refresh/only-export-components': [
+      'ok',
+      { allowConstantExport: true },
+    ],
   },
 }

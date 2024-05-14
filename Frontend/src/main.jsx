@@ -15,5 +15,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       </Provider>
     </Suspense>
     <ToastContainer />
-  </React.StrictMode>,
+  </React.StrictMode>
 )
