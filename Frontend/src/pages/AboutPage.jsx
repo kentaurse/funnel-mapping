@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import reactLogo from 'src/assets/react.svg'
 import viteLogo from '/vite.svg'
+import 'src/assets/styles/App.css'
 import { Button } from 'antd'
 
 const AboutPage = () => {
   const [count, setCount] = useState(0)
-
   return (
     <div className='w-full h-[600px] flex flex-col justify-center items-center'>
       <div className='flex'>

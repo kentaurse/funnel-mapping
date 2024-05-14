@@ -26,7 +26,7 @@ const LoginPage = () => {
     <div className="flex justify-center items-center h-[900px]">
       <div className="flex flex-col gap-5 w-[500px] border px-10 pt-10">
         <div className="flex justify-center">
-          <img src="/logo.png" className="w-24" />
+          <img src="/logo.png" />
         </div>
         <Input ref={email}/>
         <Input.Password ref={password} />
@@ -34,7 +34,7 @@ const LoginPage = () => {
         <Button type="link" className="w-5 border-none">パスワードをお忘れですか？</Button>
         <div className="flex justify-center gap-5 pb-10">
           <Button type="primary" onClick={onLogin}>ログイン</Button>
-          <Button type="primary" danger onClick={() => navigate('/register')}>登録</Button>
+          {/* <Button type="primary" danger onClick={() => navigate('/register')}>登録</Button> */}
         </div>
       </div>
     </div>
