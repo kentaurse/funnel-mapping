@@ -9,12 +9,14 @@ import ReactFlow, {
   useNodesState,
   ReactFlowProvider,
   useEdgesState,
-  useReactFlow
+  useReactFlow,
+  useStoreApi
 } from "reactflow";
 import Node from "./Node";
 import "reactflow/dist/style.css";
 import "src/assets/styles/Flow.css"
 import { setRedo, setUndo, setDownloadCanvas, setInitialCanvas } from "src/redux/slices/PageSlice";
+import { setConnecting } from "src/redux/slices/NodeSlice";
 import NodeMenu from "src/components/menu/NodeMenu";
 import { toPng } from "html-to-image";
 import jsPDF from "jspdf";
@@ -22,9 +24,11 @@ import { v4 as uuidv4 } from 'uuid';
 
 const nodeTypes = { node: Node };
 const panOnDrag = [1, 2];
+const MIN_DISTANCE = 150;
 
 const CanvasWind = () => {
   const dispatch = useDispatch();
+  const store = useStoreApi();
   const reactFlowWrapper = useRef(null);
   const reactFlowInstance = useReactFlow();
   const [instances, setInstances] = useState([]);
@@ -209,6 +213,103 @@ const CanvasWind = () => {
     dispatch(setDownloadCanvas(false));
   }
 
+  const onConnectStart = () => {
+    dispatch(setConnecting(true));
+  }
+
+  const onConnectEnd = () => {
+    dispatch(setConnecting(false));
+  }
+
+  const getClosestEdge = useCallback((node) => {
+    const { nodeInternals } = store.getState();
+    const storeNodes = Array.from(nodeInternals.values());
+
+    const closestNode = storeNodes.reduce(
+      (res, n) => {
+        if (n.id !== node.id) {
+          const dx = n.positionAbsolute.x - node.positionAbsolute.x;
+          const dy = n.positionAbsolute.y - node.positionAbsolute.y;
+          const d = Math.sqrt(dx * dx + dy * dy);
+
+          if (d < res.distance && d < MIN_DISTANCE) {
+            res.distance = d;
+            res.node = n;
+          }
+        }
+
+        return res;
+      },
+      {
+        distance: Number.MAX_VALUE,
+        node: null,
+      },
+    );
+
+    if (!closestNode.node) {
+      return null;
+    }
+
+    const closeNodeIsSource =
+      closestNode.node.positionAbsolute.x < node.positionAbsolute.x;
+
+    return {
+      id: closeNodeIsSource
+        ? `${closestNode.node.id}-${node.id}`
+        : `${node.id}-${closestNode.node.id}`,
+      source: closeNodeIsSource ? closestNode.node.id : node.id,
+      target: closeNodeIsSource ? node.id : closestNode.node.id,
+    };
+  }, []);
+
+  const onNodeDrag = useCallback(
+    (_, node) => {
+      const closeEdge = getClosestEdge(node);
+
+      setEdges((es) => {
+        const nextEdges = es.filter((e) => e.className !== 'temp');
+
+        if (
+          closeEdge &&
+          !nextEdges.find(
+            (ne) =>
+              ne.source === closeEdge.source && ne.target === closeEdge.target,
+          )
+        ) {
+          closeEdge.className = 'temp';
+          nextEdges.push(closeEdge);
+        }
+
+        return nextEdges;
+      });
+    },
+    [getClosestEdge, setEdges],
+  );
+
+  const onNodeDragStop = useCallback(
+    (_, node) => {
+      const closeEdge = getClosestEdge(node);
+
+      setEdges((es) => {
+        const nextEdges = es.filter((e) => e.className !== 'temp');
+
+        if (
+          closeEdge &&
+          !nextEdges.find(
+            (ne) =>
+              ne.source === closeEdge.source && ne.target === closeEdge.target,
+          )
+        ) {
+          nextEdges.push(closeEdge);
+        }
+
+        return nextEdges;
+      });
+      handleChange();
+    },
+    [getClosestEdge],
+  );
+
   useEffect(() => {
     if (isDownloadCanvas) {
       toPng(document.querySelector(".reactflow-wrapper"), {
@@ -240,7 +341,10 @@ const CanvasWind = () => {
           onNodesDelete={handleChange}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
-          onNodeDragStop={handleChange}
+          onNodeDrag={onNodeDrag}
+          onNodeDragStop={onNodeDragStop}
+          onConnectEnd={onConnectEnd}
+          onConnectStart={onConnectStart}
           onConnect={(e) => {
             onConnect(e);
             handleChange();

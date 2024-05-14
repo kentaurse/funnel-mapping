@@ -18,7 +18,7 @@ const position = {
 
 const Node = ({ data, selected }) => {
   const dispatch = useDispatch();
-  const { isChange, point, nodeData, colorData, messageData } = useSelector(state => state.node);
+  const { isChange, point, nodeData, colorData, messageData, isConnecting } = useSelector(state => state.node);
   const { setNodes } = useReactFlow();
   const updateNodeInternals = useUpdateNodeInternals();
 
