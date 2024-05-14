@@ -1,37 +1,35 @@
 import React from 'react';
 import { 
-  Route,
+  Route, 
   redirect,
-  RouterProvider,
-  createBrowserRouter,
-  createRoutesFromElements,
+  RouterProvider, 
+  createBrowserRouter, 
+  createRoutesFromElements, 
 } from "react-router-dom";
 import axios from 'axios';
-import { ThemeProvider } from 'src/components/Theme';
-import { tokenLogin } from 'src/components/TokenLogin';
-import App from 'src/App';
 import Public from 'src/routers/Public';
 import Private from 'src/routers/Private';
-import Error from 'src/components/Error';
+import App from 'src/App';
 import LoginPage from 'src/pages/LoginPage';
 import RegisterPage from 'src/pages/RegisterPage';
+import WorkspacePage from 'src/pages/WorkspacePage';
 import AboutPage from 'src/pages/AboutPage';
-import Dashboard from 'src/pages/Dashboard';
-import Blog from 'src/pages/Blog';
+import { ThemeProvider } from 'src/components/Theme';
+import { tokenLogin } from 'src/components/TokenLogin';
 
-axios.defaults.baseURL = process.env.REACT_API_BASE_URL;
+axios.defaults.baseURL = env.REACT_APP_BASE_URL;
 
 const AppRouter = () => {
   const router = createBrowserRouter(
     createRoutesFromElements(
       <>
         <Route element={<App />}>
-          <Route element={<Private />} errorElement={<Error />} loader={async () => {
+          <Route element={<Private />} loader={async () => {
             const tokenData = await tokenLogin();
             return { tokenData };
           }}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/blog" element={<Blog />} />
+            <Route path="/workspace" element={<WorkspacePage />} />
+            <Route path="/about" element={<AboutPage />} />
           </Route>
         </Route>
         <Route element={<Public />} loader={async () => {
@@ -41,8 +39,7 @@ const AppRouter = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
         </Route>
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="*" loader={() => redirect('/dashboard')} />
+        <Route path="*" loader={() => redirect('/workspace')} />
       </>
     )
   );
