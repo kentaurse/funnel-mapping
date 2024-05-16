@@ -1,5 +1,9 @@
 # founnel-mapping
 
+This is React + Vite + Javascript + Tailwindcss + Antd + Redux/toolkit + Reactflow
+
+Start react+vite project start
+
 npm create vite@latest
 
 npm i antd
