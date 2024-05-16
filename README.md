@@ -1,4 +1,4 @@
-# founnel-mapping
+# founnel-mapping(simulation)
 
 This is React + Vite + Javascript + Tailwindcss + Antd + Redux/toolkit + Reactflow
 
