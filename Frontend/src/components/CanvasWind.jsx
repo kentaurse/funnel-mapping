@@ -24,7 +24,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const nodeTypes = { node: Node };
 const panOnDrag = [1, 2];
-const MIN_DISTANCE = 150;
+const MIN_DISTANCE = 200;
 
 const CanvasWind = () => {
   const dispatch = useDispatch();
