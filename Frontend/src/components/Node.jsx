@@ -1,6 +1,6 @@
 import React, { memo, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux';
-import { Handle, Position, useReactFlow, useUpdateNodeInternals } from "reactflow";
+import { Handle, Position, useReactFlow, useUpdateNodeInternals, useStore } from "reactflow";
 import { setNodeMenu, setNodeSettingDlg } from 'src/redux/slices/PageSlice';
 import { setChange, setNodeData, setPoint, setColorData, setMessageData } from 'src/redux/slices/NodeSlice';
 import { Tooltip } from 'antd';
@@ -15,8 +15,10 @@ const position = {
     common: [0, 50]
   }
 }
+const connectionNodeIdSelector = (state) => state.connectionNodeId;
 
 const Node = ({ data, selected }) => {
+  const connectionNodeId = useStore(connectionNodeIdSelector);
   const dispatch = useDispatch();
   const { isChange, point, nodeData, colorData, messageData, isConnecting } = useSelector(state => state.node);
   const { setNodes } = useReactFlow();
@@ -95,6 +97,9 @@ const Node = ({ data, selected }) => {
         )
       })}
 
+      <Handle type="source" position={Position.Right} className="w-0 h-0" style={{ top: `${position.right.first[0]}%` }} id="right" />
+      <Handle type="source" position={Position.Bottom} className="w-0 h-0" id="buttom" />
+      
       <Handle type="target" position={Position.Left} className="w-0 h-0" style={{ top: `${position.right.first[0]}%` }} id="left" />
       <Handle type="target" position={Position.Top} className="w-0 h-0" id="top" />
     </div>
