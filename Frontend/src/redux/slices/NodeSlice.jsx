@@ -6,7 +6,8 @@ const initialState = {
   colorData: null,
   messageData: null,
   isChange: false,
-  isConnecting: false
+  isConnecting: false,
+  isDelete: false,
 }
 
 export const NodeSlice = createSlice({
@@ -30,10 +31,13 @@ export const NodeSlice = createSlice({
     },
     setConnecting: (state, action) => {
       state.isConnecting = action.payload
+    },
+    setDelete: (state, action) => {
+      state.isDelete = action.payload
     }
   },
 })
 
-export const { setNodeData, setPoint, setChange, setColorData, setMessageData, setConnecting } = NodeSlice.actions
+export const { setNodeData, setPoint, setChange, setColorData, setMessageData, setConnecting, setDelete } = NodeSlice.actions
 
 export default NodeSlice.reducer

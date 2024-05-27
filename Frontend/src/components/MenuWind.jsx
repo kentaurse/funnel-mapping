@@ -11,6 +11,7 @@ import SettingDialog from "src/components/dialog/SettingDialog";
 import ShareDialog from "src/components/dialog/ShareDialog";
 import JointDialog from "src/components/dialog/JointDialog";
 import { setViewMode, addOpenFiles, removeOpenFiles, setTempFile, setSelectFile, onFileWndLoading, setRedo, setUndo, setInitialCanvas } from 'src/redux/slices/PageSlice';
+import { setDelete } from 'src/redux/slices/NodeSlice';
 import DownloadMenu from 'src/components/menu/DownloadMenu';
 
 const MenuWind = () => {
@@ -122,7 +123,7 @@ const MenuWind = () => {
         <button onClick={() => dispatch(setUndo(true))}><TiArrowBackOutline className='text-[30px] text-[#08c]'/></button>
         <button onClick={() => dispatch(setRedo(true))}><TiArrowForwardOutline className='text-[30px] text-[#08c]'/></button>
         <button onClick={() => dispatch(setInitialCanvas(true))}><FaRecycle className='text-[30px] text-[#08c]'/></button>
-        <button><LuTrash2 className='text-[30px] text-[#08c]'/></button>
+        <button onClick={() => dispatch(setDelete(true))}><LuTrash2 className='text-[30px] text-[#08c]'/></button>
       </div>
       
       <NewDialog open={modal.new} onOk={() => handleOk('new')} onCancel={handleCancel} />
