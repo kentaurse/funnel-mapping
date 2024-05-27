@@ -17,8 +17,9 @@ const position = {
 }
 const connectionNodeIdSelector = (state) => state.connectionNodeId;
 
-const Node = ({ data, selected }) => {
+const Node = ({ data, selected, id }) => {
   const connectionNodeId = useStore(connectionNodeIdSelector);
+  const isTarget = connectionNodeId && connectionNodeId !== id;
   const dispatch = useDispatch();
   const { isChange, point, nodeData, colorData, messageData, isConnecting } = useSelector(state => state.node);
   const { setNodes } = useReactFlow();
@@ -69,7 +70,7 @@ const Node = ({ data, selected }) => {
   }, [isChange])
 
   return (
-    <div className="basicNode flex flex-col items-center justify-center w-[150px]" onClick={handleClick} onContextMenu={(e) => e.preventDefault()}>
+    <div className={`basicNode flex flex-col items-center justify-center w-[150px]`} onClick={handleClick} onContextMenu={(e) => e.preventDefault()}>
       <p>{data.heading}</p>
       {(data.message?.content1 !== null && data.message?.content2 !== null && selected) ? <Tooltip placement="topLeft" title={(
         <div>
@@ -78,7 +79,7 @@ const Node = ({ data, selected }) => {
           <p>{data.message?.content2}</p>
         </div>
       )} arrow={true}>
-        <img src={data.image} onContextMenu={(e) => { e.preventDefault(); handleClick(); dispatch(setNodeMenu({ x: e.clientX, y: e.clientY, flag: true })) }} onDoubleClick={() => dispatch(setNodeSettingDlg(true))} className={`${selected ? 'outline outline-2 outline-dashed outline-yellow-500' : ''}`} />
+        <img src={data.image} onContextMenu={(e) => { e.preventDefault(); handleClick(); dispatch(setNodeMenu({ x: e.clientX, y: e.clientY, flag: true })) }} onDoubleClick={() => dispatch(setNodeSettingDlg(true))} className={`${selected ? 'outline outline-2 outline-dashed outline-yellow-500 w-[150px]' : 'w-[150px]'}`} />
       </Tooltip> : <img src={data.image} onContextMenu={(e) => { e.preventDefault(); handleClick(); dispatch(setNodeMenu({ x: e.clientX, y: e.clientY, flag: true })) }} onDoubleClick={() => dispatch(setNodeSettingDlg(true))} className={`${selected ? 'outline outline-2 outline-dashed outline-yellow-500' : ''}`} />}
       {data.point?.right?.map((item, index) => {
         const bgStyle = data.color.right[index] ? data.color.right[index] : '#81c556';
@@ -98,13 +99,13 @@ const Node = ({ data, selected }) => {
       })}
       {(data.point?.right?.length == 0 && data.point?.bottom?.length == 0) &&
         <>
-          <Handle type="source" position={Position.Right} className="invisible" style={{ top: `${position.right.first[0]}%` }} id="right" />
-          <Handle type="source" position={Position.Bottom} className="invisible" id="buttom" />
+          <Handle type="source" position={Position.Right} className={`dynamicHandle ${(isConnecting && isTarget) ? 'hideSide' : 'invisible'}`} style={{ top: `${position.right.first[0]}%` }} id="right" />
+          <Handle type="source" position={Position.Bottom} className={`dynamicHandle ${(isConnecting && isTarget) ? 'hideSide' : 'invisible'}`} id="buttom" />
         </>
       }
 
-      <Handle type="target" position={Position.Left} className="invisible" style={{ top: `${position.right.first[0]}%` }} id="left" />
-      <Handle type="target" position={Position.Top} className="invisible" id="top" />
+      <Handle type="target" position={Position.Left} className={`dynamicHandle ${(isConnecting && isTarget) ? 'hideSide' : 'invisible'}`} style={{ top: `${position.right.first[0]}%` }} id="left" />
+      <Handle type="target" position={Position.Top} className={`dynamicHandle ${(isConnecting && isTarget) ? 'hideSide' : 'invisible'}`} id="top" />
     </div>
   );
 };
