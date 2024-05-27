@@ -96,12 +96,15 @@ const Node = ({ data, selected }) => {
           </Handle>
         )
       })}
+      {(data.point?.right?.length == 0 && data.point?.bottom?.length == 0) &&
+        <>
+          <Handle type="source" position={Position.Right} className="invisible" style={{ top: `${position.right.first[0]}%` }} id="right" />
+          <Handle type="source" position={Position.Bottom} className="invisible" id="buttom" />
+        </>
+      }
 
-      <Handle type="source" position={Position.Right} className="w-0 h-0" style={{ top: `${position.right.first[0]}%` }} id="right" />
-      <Handle type="source" position={Position.Bottom} className="w-0 h-0" id="buttom" />
-      
-      <Handle type="target" position={Position.Left} className="w-0 h-0" style={{ top: `${position.right.first[0]}%` }} id="left" />
-      <Handle type="target" position={Position.Top} className="w-0 h-0" id="top" />
+      <Handle type="target" position={Position.Left} className="invisible" style={{ top: `${position.right.first[0]}%` }} id="left" />
+      <Handle type="target" position={Position.Top} className="invisible" id="top" />
     </div>
   );
 };
