@@ -10,13 +10,14 @@ import ReactFlow, {
   ReactFlowProvider,
   useEdgesState,
   useReactFlow,
-  useStoreApi
+  useStoreApi,
+  useStore,
 } from "reactflow";
 import Node from "./Node";
 import "reactflow/dist/style.css";
 import "src/assets/styles/Flow.css"
 import { setRedo, setUndo, setDownloadCanvas, setInitialCanvas } from "src/redux/slices/PageSlice";
-import { setConnecting } from "src/redux/slices/NodeSlice";
+import { setConnecting, setDelete } from "src/redux/slices/NodeSlice";
 import NodeMenu from "src/components/menu/NodeMenu";
 import { toPng } from "html-to-image";
 import jsPDF from "jspdf";
@@ -31,14 +32,18 @@ const CanvasWind = () => {
   const store = useStoreApi();
   const reactFlowWrapper = useRef(null);
   const reactFlowInstance = useReactFlow();
+  const { deleteElements } = useReactFlow();
   const [instances, setInstances] = useState([]);
   const [redoStack, setRedoStack] = useState([]);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   const { isUndo, isRedo, selectFile, isDownloadCanvas, isInitialCanvas } = useSelector(state => state.page);
+  const { isDelete, nodeData } = useSelector(state => state.node);
 
   const onConnect = useCallback((params) => {
+    console.log('params');
+    console.log(params);
     setEdges((eds) => addEdge({ ...params, markerEnd: { type: "arrowclosed" } }, eds));
   }, [setEdges]);
 
@@ -232,7 +237,7 @@ const CanvasWind = () => {
           const dy = n.positionAbsolute.y - node.positionAbsolute.y;
           const d = Math.sqrt(dx * dx + dy * dy);
 
-          if (d < res.distance && d < MIN_DISTANCE) {
+          if (d < res.distance && d < MIN_DISTANCE && n.data.point?.right?.length == 0 && n.data.point?.bottom?.length == 0 && node.data.point?.right?.length == 0 && node.data.point?.bottom?.length == 0) {
             res.distance = d;
             res.node = n;
           }
@@ -327,6 +332,18 @@ const CanvasWind = () => {
       dispatch(setInitialCanvas(false));
     }
   }, [isInitialCanvas, dispatch])
+
+  useEffect(() => {
+    if (isDelete) {
+      const { nodeInternals } = store.getState();
+      const storeNodes = Array.from(nodeInternals.values());
+      const selectNode = storeNodes.filter(item => item.id === nodeData.id);
+      deleteElements({
+        nodes: selectNode,
+      })
+      dispatch(setDelete(false));
+    }
+  }, [isDelete, dispatch])
 
   return (
     <div className="w-full h-[850px]">
