@@ -121,3 +121,14 @@
 .react-flow__panel.react-flow__attribution {
   display: none !important;
 }
+
+.hideSide {
+  opacity: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.basicNode:hover .dynamicHandle:hover {
+  visibility: visible;
+  opacity: 1;
+}
