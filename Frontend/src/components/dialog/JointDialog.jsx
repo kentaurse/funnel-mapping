@@ -77,7 +77,7 @@ const JointDialog = ({ open, onOk, onCancel }) => {
             </div>
             <div className='h-[400px] overflow-y-auto no-scrollbar border-t'>
               <Menu mode='inline' className='select-none' onSelect={onSelect}>
-                {parents.map(item, key => {
+                {/* {parents.map(item, key => {
                   <SubMenu key={key} title={
                     <div className='flex justify-between pr-2'>
                       <div className='flex items-center gap-2'>
@@ -89,7 +89,7 @@ const JointDialog = ({ open, onOk, onCancel }) => {
                   }>
 
                   </SubMenu>  
-                })}
+                })} */}
                 <SubMenu key={'1'} title={
                   <div className='flex justify-between pr-2'>
                     <div className='flex items-center gap-2'>
