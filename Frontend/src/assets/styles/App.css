@@ -38,6 +38,10 @@
   @apply bg-base-200 px-2 border border-[--base-100] rounded-lg focus:outline-none h-[30px]
 }
 
+.editEdgeLabel {
+  @apply bg-base-200 px-2 border border-[--base-100] rounded-lg focus:outline-none h-[30px]
+}
+
 div #font-picker {
   @apply w-28 rounded-md shadow-none border
 }

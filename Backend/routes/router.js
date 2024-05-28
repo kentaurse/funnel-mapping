@@ -15,4 +15,9 @@ router.post('/file', authenticateJwt, workspaceController.setFile);
 router.put('/file', authenticateJwt, workspaceController.updateFile);
 router.delete('/file', authenticateJwt, workspaceController.deleteFile);
 
+router.get('/category', authenticateJwt, workspaceController.getCategory);
+router.post('/category', authenticateJwt, workspaceController.setCategory);
+router.put('/category', authenticateJwt, workspaceController.updateCategory);
+router.delete('/category', authenticateJwt, workspaceController.deleteCategory);
+
 module.exports = router;
