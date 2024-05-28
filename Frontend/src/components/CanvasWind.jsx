@@ -42,8 +42,6 @@ const CanvasWind = () => {
   const { isDelete, nodeData } = useSelector(state => state.node);
 
   const onConnect = useCallback((params) => {
-    console.log('params');
-    console.log(params);
     setEdges((eds) => addEdge({ ...params, markerEnd: { type: "arrowclosed" } }, eds));
   }, [setEdges]);
 
@@ -345,6 +343,49 @@ const CanvasWind = () => {
     }
   }, [isDelete, dispatch])
 
+  const [editingEdge, setEditingEdge] = useState(null);
+  const [label, setLabel] = useState('');
+  const [inputPosition, setInputPosition] = useState({ x: 0, y: 0 });
+  const onSaveEdgeLabel = () => {
+
+  }
+  const onEdgeDoubleClick = (event, edge) => {
+    event.stopPropagation();
+    setEditingEdge(edge);
+    setLabel(edge.label || '');
+    setEdges((eds) =>
+      eds.map((edge) => {
+        if (edge.selected) {
+          edge.label = ''
+        }
+
+        return edge;
+      })
+    );
+    const { clientX, clientY } = event;
+    setInputPosition({ x: clientX, y: clientY });
+  }
+  const handleInputChange = (event) => {
+    setLabel(event.target.value);
+  };
+
+  const handleInputBlur = () => {
+    setEdges((els) =>
+      els.map((el) => {
+        if (el.id === editingEdge.id) {
+          el.label = label;
+        }
+        return el;
+      })
+    );
+    setEditingEdge(null);
+  };
+
+  const handleInputKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      event.target.blur();
+    }
+  };
   return (
     <div className="w-full h-[850px]">
       <div className="reactflow-wrapper" ref={reactFlowWrapper}>
@@ -362,6 +403,7 @@ const CanvasWind = () => {
           onNodeDragStop={onNodeDragStop}
           onConnectEnd={onConnectEnd}
           onConnectStart={onConnectStart}
+          onEdgeDoubleClick={onEdgeDoubleClick}
           onConnect={(e) => {
             onConnect(e);
             handleChange();
@@ -382,6 +424,24 @@ const CanvasWind = () => {
             <ControlButton onClick={redo} className="text-black">↺</ControlButton>
           </Controls>
         </ReactFlow>
+        {editingEdge && (
+          <input
+            type="text"
+            className="editEdgeLabel"
+            style={{
+              position: 'absolute',
+              top: inputPosition.y - 105,
+              left: inputPosition.x - 600,
+              transform: 'translate(-50%, -50%)',
+              zIndex: 10,
+            }}
+            value={label}
+            onChange={handleInputChange}
+            onBlur={handleInputBlur}
+            onKeyDown={handleInputKeyDown}
+            autoFocus
+          />
+        )}
       </div>
     </div>
   );
