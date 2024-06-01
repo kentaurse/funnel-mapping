@@ -38,7 +38,7 @@ const Header = () => {
         </button>
         <LogoMenu>
           <div className='flex items-center gap-2'>
-            <img src='/user.png' className='w-[40px] rounded-full'/>
+            <img src='User/user.png' className='w-[40px] rounded-full'/>
             <p>{userName}</p>
           </div>
         </LogoMenu>
