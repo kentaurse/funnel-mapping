@@ -335,7 +335,7 @@ const CanvasWind = () => {
     if (isDelete) {
       const { nodeInternals } = store.getState();
       const storeNodes = Array.from(nodeInternals.values());
-      const selectNode = storeNodes.filter(item => item.id === nodeData.id);
+      const selectNode = storeNodes.filter(item => item?.id === nodeData?.id);
       deleteElements({
         nodes: selectNode,
       })

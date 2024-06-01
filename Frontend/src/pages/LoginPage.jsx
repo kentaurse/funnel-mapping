@@ -24,7 +24,7 @@ const LoginPage = () => {
 
   return (
     <div className="flex justify-center items-center h-[900px]">
-      <div className="flex flex-col gap-5 w-[500px] border px-10 pt-10">
+      <div className="flex flex-col gap-5 w-[500px] bg-base-200 border border-base-100 px-10 pt-10">
         <div className="flex justify-center">
           <img src="/logo.png" />
         </div>

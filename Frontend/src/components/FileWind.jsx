@@ -144,21 +144,21 @@ const FileWind = () => {
       <div>
         <div className='select-none pb-5'>
           <div className='flex items-end gap-2 px-8 bg-[#08c] py-2'>
-            <img src='fheader/1.png' className='w-7' />
+            <img src='FileWnd/LSEED.png' className='w-7' />
             <h2>LSEED</h2>
           </div>
           <Menu items={itemList.lseed} mode="inline" className='bg-base-300' />
         </div>
         <div className='select-none pb-5'>
           <div className='flex items-end gap-2 px-8 bg-[#08c] py-2'>
-            <img src='fheader/2.png' className='w-7' />
+            <img src='FileWnd/ActiveCampaign.png' className='w-7' />
             <h2>ActiveCampaign</h2>
           </div>
           <Menu items={itemList.active} mode="inline" className='bg-base-300' />
         </div>
         <div>
           <div className='flex items-end select-none gap-2 px-8 bg-[#08c] py-2'>
-          <img src='fheader/3.png' className='w-7' />
+          <img src='FileWnd/Other.png' className='w-7' />
             <h2>その他オブジェクト</h2>
           </div>
           <Menu items={itemList.other} mode="inline" className='bg-base-300' />

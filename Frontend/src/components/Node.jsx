@@ -45,6 +45,10 @@ const Node = ({ data, selected, id }) => {
     dispatch(setNodeData(data));
   }
 
+  // useEffect(() => {
+  //   console.log(data);
+  // }, [selected])
+
   useEffect(() => {
     if (isChange) {
       setNodes((nds) =>
@@ -70,7 +74,7 @@ const Node = ({ data, selected, id }) => {
   }, [isChange])
 
   return (
-    <div className={`basicNode flex flex-col items-center justify-center w-[150px]`} onClick={handleClick} onContextMenu={(e) => e.preventDefault()}>
+    <div className={`basicNode flex flex-col items-center justify-center w-[150px]`} onMouseDown={handleClick} onClick={handleClick} onContextMenu={(e) => e.preventDefault()}>
       <p>{data.heading}</p>
       {(data.message?.content1 !== null && data.message?.content2 !== null && selected) ? <Tooltip placement="topLeft" title={(
         <div>
