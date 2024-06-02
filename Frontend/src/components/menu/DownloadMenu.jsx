@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dropdown } from 'antd';
-import { setDownloadCanvas } from "src/redux/slices/PageSlice";
+import { setDownloadCanvas, setDownloadContent } from "src/redux/slices/PageSlice";
 import { useDispatch } from 'react-redux';
 
 const AppMenu = ({ children }) => {
@@ -15,7 +15,7 @@ const AppMenu = ({ children }) => {
     { 
       key: '2', 
       label: (
-        <button>コンテンツデータエクスポート</button>
+        <button onClick={() => dispatch(setDownloadContent(true))}>コンテンツデータエクスポート</button>
       ) 
     },
   ];

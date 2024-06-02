@@ -4,10 +4,12 @@ import { LiaFolderPlusSolid, LiaFolderSolid, LiaFileMedicalSolid, LiaFile } from
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { onFileWndLoading, addOpenFiles, setTempFile, setSelectFile, setSelectFolder, setRename } from 'src/redux/slices/PageSlice';
+import NewDialog from "src/components/dialog/NewDialog";
 
 const FileWind = () => {
   const [itemList, setItemList] = useState({});
   const [workFileList, setWorkFileList] = useState([]);
+  const [modal, setModal] = useState(false);
   const dispatch = useDispatch();
   const { openFiles, selectFile, selectFolder, isFileWndLoading } = useSelector(state => state.page);
 
@@ -56,10 +58,8 @@ const FileWind = () => {
   const setItems = async (flag) => {
     if(flag){
       await axios.post('/file', {name: 'New', classify: 'work', parentId: 'parent', isDirectory: flag});
-    }else if(selectFolder !== null){
-      await axios.post('/file', {name: 'New File', classify: 'work', parentId: selectFolder, isDirectory: flag});
     }else {
-      Notification('Please select folder!', 'warn');
+      await axios.post('/file', {name: 'New File', classify: 'work', parentId: selectFolder, isDirectory: flag});
     }
     getItems();
   }
@@ -116,6 +116,23 @@ const FileWind = () => {
     }
   }
   
+  const handleOk = (e) => {
+    setModal(false);
+    getItems();
+  }
+  
+  const handleCancel = () => {
+    setModal(false);
+  }
+  
+  const openModal = () => {
+    if(selectFolder !== null) {
+      setModal(true)
+    }else {
+      Notification('Please select folder!', 'warn');
+    }
+  }
+
   useEffect(() => {
     if(isFileWndLoading) {
       dispatch(onFileWndLoading());
@@ -134,7 +151,7 @@ const FileWind = () => {
           <h2>MYプロジェクト</h2>
           <div className='flex gap-1'>
             <button onClick={() => setItems(true)}><LiaFolderPlusSolid className='text-[40px] text-[#cca700]' /></button>
-            <button onClick={() => setItems(false)}><LiaFileMedicalSolid className='text-[40px] text-[#cca700]' /></button>
+            <button onClick={() => openModal()}><LiaFileMedicalSolid className='text-[40px] text-[#cca700]' /></button>
           </div>
         </div>
         <Radio.Group onChange={onSelectFolder} className='w-full'>
@@ -164,6 +181,7 @@ const FileWind = () => {
           <Menu items={itemList.other} mode="inline" className='bg-base-300' />
         </div>
       </div>
+      <NewDialog open={modal} onOk={() => handleOk('new')} onCancel={handleCancel} />
     </div>
   );
 }

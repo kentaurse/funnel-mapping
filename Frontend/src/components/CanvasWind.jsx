@@ -1,3 +1,4 @@
+import * as XLSX from 'xlsx';
 import React, { useCallback, useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import axios from "axios";
@@ -16,7 +17,7 @@ import ReactFlow, {
 import Node from "./Node";
 import "reactflow/dist/style.css";
 import "src/assets/styles/Flow.css"
-import { setRedo, setUndo, setDownloadCanvas, setInitialCanvas } from "src/redux/slices/PageSlice";
+import { setRedo, setUndo, setDownloadCanvas, setDownloadContent, setInitialCanvas } from "src/redux/slices/PageSlice";
 import { setConnecting, setDelete } from "src/redux/slices/NodeSlice";
 import NodeMenu from "src/components/menu/NodeMenu";
 import { toPng } from "html-to-image";
@@ -38,7 +39,7 @@ const CanvasWind = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  const { isUndo, isRedo, selectFile, isDownloadCanvas, isInitialCanvas } = useSelector(state => state.page);
+  const { isUndo, isRedo, selectFile, isDownloadCanvas, isDownloadContent, isInitialCanvas } = useSelector(state => state.page);
   const { isDelete, nodeData } = useSelector(state => state.node);
 
   const onConnect = useCallback((params) => {
@@ -143,6 +144,10 @@ const CanvasWind = () => {
         color: {
           right: [],
           bottom: [],
+        },
+        category: {
+          plus: [],
+          minus: [],
         },
         message: {
           content1: null,
@@ -322,6 +327,36 @@ const CanvasWind = () => {
       }).then(downloadImage);
     }
   }, [isDownloadCanvas, dispatch])
+
+  const transformData = (nodes) => {
+    return nodes.reduce((acc, node, index) => {
+      acc[`content_field_${index * 2 + 1}`] = node.data.message.content1;
+      acc[`content_field_${index * 2 + 2}`] = node.data.message.content2;
+      return acc;
+    }, {});
+  };
+
+  useEffect(() => {
+    if (isDownloadContent) {
+      const { nodeInternals } = store.getState();
+      const storeNodes = Array.from(nodeInternals.values());
+      const transformedData = transformData(storeNodes);
+      const resultData = {
+        NO: "",
+        タイトル: "",
+        タイプ: "",
+        カテゴリー: "",
+        メモ: "",
+        ...transformedData,
+        '作成⽇': ""
+      };
+      const worksheet = XLSX.utils.json_to_sheet([resultData]);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Content');
+      XLSX.writeFile(workbook, 'content.xlsx');
+      dispatch(setDownloadContent(false));
+    }
+  }, [isDownloadContent, dispatch])
 
   useEffect(() => {
     if (isInitialCanvas) {
