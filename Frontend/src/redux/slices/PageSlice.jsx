@@ -12,6 +12,7 @@ const initialState = {
   isUndo: false,
   isRedo: false,
   isDownloadCanvas: false,
+  isDownloadContent: false,
   isInitialCanvas: false,
   isNodeSettingDlg: false,
   nodeMenu: {x: 0, y: 0, flag: false},
@@ -48,7 +49,7 @@ export const PageSlice = createSlice({
       }
     },
     setTempFile: (state, action) => {
-      if(action.payload == null && state.tempFile.key == state.selectFile) {
+      if(action.payload == null && state.tempFile?.key == state.selectFile) {
         if(state.openFiles.length == 0) state.selectFile = null;
         else state.selectFile = state.openFiles[state.openFiles.length - 1].key;
       }
@@ -78,6 +79,9 @@ export const PageSlice = createSlice({
     setDownloadCanvas: (state, action) => {
       state.isDownloadCanvas = action.payload;
     },
+    setDownloadContent: (state, action) => {
+      state.isDownloadContent = action.payload;
+    },
     setInitialCanvas: (state, action) => {
       state.isInitialCanvas = action.payload
     },
@@ -90,6 +94,6 @@ export const PageSlice = createSlice({
   },
 })
 
-export const { setViewMode, onFileWndLoading, onFileWind, onObjectWnd, addOpenFiles, removeOpenFiles, setTempFile, setSelectFile, setSelectFolder, setRename, setUndo, setRedo, setDownloadCanvas, setInitialCanvas, setNodeSettingDlg, setNodeMenu } = PageSlice.actions
+export const { setViewMode, onFileWndLoading, onFileWind, onObjectWnd, addOpenFiles, removeOpenFiles, setTempFile, setSelectFile, setSelectFolder, setRename, setUndo, setRedo, setDownloadCanvas, setDownloadContent, setInitialCanvas, setNodeSettingDlg, setNodeMenu } = PageSlice.actions
 
 export default PageSlice.reducer

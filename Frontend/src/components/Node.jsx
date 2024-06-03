@@ -21,7 +21,7 @@ const Node = ({ data, selected, id }) => {
   const connectionNodeId = useStore(connectionNodeIdSelector);
   const isTarget = connectionNodeId && connectionNodeId !== id;
   const dispatch = useDispatch();
-  const { isChange, point, nodeData, colorData, messageData, isConnecting } = useSelector(state => state.node);
+  const { isChange, point, nodeData, colorData, messageData, isConnecting, category } = useSelector(state => state.node);
   const { setNodes } = useReactFlow();
   const updateNodeInternals = useUpdateNodeInternals();
 
@@ -58,6 +58,7 @@ const Node = ({ data, selected, id }) => {
               ...n.data,
               point: point,
               color: colorData,
+              category: category,
               message: messageData
             };
             return { ...n };

@@ -1,9 +1,15 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { Button, Input, Select, Modal, Divider } from 'antd';
 import ColorButton from "src/components/common/ColorButton";
+import { useSelector, useDispatch } from 'react-redux';
+import axios from 'axios';
+import { setViewMode, addOpenFiles, removeOpenFiles, setTempFile, setSelectFile, onFileWndLoading, setRedo, setUndo, setInitialCanvas } from 'src/redux/slices/PageSlice';
 const { TextArea } = Input;
 
-const NewDialog = ({ open, onOk, onCancel }) => {
+const NewDialog = ({ open, onOk, onCancel, flag = false }) => {
+  const dispatch = useDispatch();
+  const [name, setName] = useState('')
+  const { selectFolder } = useSelector(state => state.page);
   const [colors, setColors] = useState({
     theme: ['#81c556', '#4392ee', '#f24237', '#f2f351', '#af319f', '#ed7230'],
     tag: ['#81c556', '#4392ee', '#f24237', '#f2f351', '#af319f', '#ed7230'],
@@ -12,7 +18,7 @@ const NewDialog = ({ open, onOk, onCancel }) => {
   });
   const colorSettings = ['テーマ', 'タグ', 'リスト', 'フィールド'];
   const type = ['theme', 'tag', 'list', 'field'];
-  
+
   const options = [
     {
       label: <div className='flex gap-2 items-center'>
@@ -78,6 +84,18 @@ const NewDialog = ({ open, onOk, onCancel }) => {
     ));
   };
 
+  const onSaveFile = async () => {
+    if (name !== '') {
+      const item = await axios.post('/file', { name: name, classify: 'work', parentId: selectFolder, isDirectory: false });
+      if (flag) {
+        dispatch(onFileWndLoading());
+        dispatch(addOpenFiles({ key: item.data._id, name: name }));
+        dispatch(setSelectFile(item.data._id));
+        dispatch(setTempFile(null));
+      }
+      onOk();
+    } else Notification('Please input file name!', 'warn');
+  }
   return (
     <Modal className='select-none' centered open={open} onOk={onOk} onCancel={onCancel} footer={false}>
       <h3 className='text-center pt-5'>新規追加</h3>
@@ -85,7 +103,7 @@ const NewDialog = ({ open, onOk, onCancel }) => {
       <div className='flex flex-col gap-y-3 px-10'>
         <div>
           <div className='flex gap-2'>タイトル <p className='text-red-500'>*</p></div>
-          <Input type="text" />
+          <Input type="text" onChange={e => setName(e.target.value)} />
         </div>
         <div>
           <div className='flex gap-2'>タイプ <p className='text-red-500'>*</p></div>
@@ -112,7 +130,7 @@ const NewDialog = ({ open, onOk, onCancel }) => {
         </div>
         <div className='flex justify-center gap-14'>
           <Button>キャンセル</Button>
-          <Button type='primary'>保存</Button>
+          <Button type='primary' onClick={onSaveFile}>保存</Button>
         </div>
       </div>
     </Modal>

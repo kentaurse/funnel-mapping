@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { MdClose } from "react-icons/md";
 import { Select, Tabs, Input, Button, Checkbox, Divider } from 'antd';
@@ -9,7 +9,7 @@ import { CiCirclePlus, CiCircleMinus } from "react-icons/ci";
 import { VscTag } from "react-icons/vsc";
 import JointDialog from "src/components/dialog/JointDialog";
 import { setNodeSettingDlg } from "src/redux/slices/PageSlice";
-import { setChange, setPoint, setColorData, setMessageData } from "src/redux/slices/NodeSlice";
+import { setChange, setPoint, setColorData, setMessageData, setCategory, setArrayCategory } from "src/redux/slices/NodeSlice";
 
 const colors = ['#81c556', '#4392ee', '#f24237', '#f2f351', '#af319f', '#ed7230'];
 
@@ -27,8 +27,11 @@ const Category = ({ text, type, flag }) => (
 )
 
 const Joint = ({ text, setText, setColor, type, index, joint, color }) => {
+  const dispatch = useDispatch();
+  const { category } = useSelector(state => state.node);
   const [isJoint, setJoint] = useState(false);
   const [jointColor, setJointColor] = useState(null);
+
   const handleOk = () => {
     setJoint(false);
   }
@@ -65,8 +68,22 @@ const Joint = ({ text, setText, setColor, type, index, joint, color }) => {
           <button onClick={() => setJoint(true)}><FaPlusCircle className='text-[20px] text-[#08c]' /></button>
         </div>
         <div className='flex flex-wrap gap-1 max-w-[192px]'>
-          <Category text="タグAAA" type={1} flag={true} />
-          <Category text="リストAAA" type={2} flag={false} />
+          {category['plus']?.map((item, key) => {
+            let type;
+            if (item.type === 'tag') type = 1;
+            if (item.type === 'list') type = 2;
+            if (item.type === 'field') type = 3;
+            if (item.type === 'category') type = 4;
+            return (<Category text={item.name} type={type} flag={true} />);
+          })}
+          {category['minus']?.map((item, key) => {
+            let type;
+            if (item.type === 'tag') type = 1;
+            if (item.type === 'list') type = 2;
+            if (item.type === 'field') type = 3;
+            if (item.type === 'category') type = 4;
+            return (<Category text={item.name} type={type} flag={false} />);
+          })}
         </div>
       </div>
       <div className="flex justify-between pt-7">
@@ -88,8 +105,9 @@ const Joint = ({ text, setText, setColor, type, index, joint, color }) => {
 
 const NodeSettingDialog = () => {
   const dispatch = useDispatch();
-  const { nodeData } = useSelector(state => state.node);
+  const { nodeData, category, arrayCategory } = useSelector(state => state.node);
   const [isjoint, setIsJoint] = useState(false);
+  const [jointIdentify, setJointIdentify] = useState(['right', '0']);
   const [message, setMessage] = useState({
     content1: null,
     content2: null
@@ -144,17 +162,38 @@ const NodeSettingDialog = () => {
       children: <Joint key={`bJoint-${index}`} text={text} setText={setJoint} setColor={setColor} type='bottom' index={index} joint={joint} color={color} />
     }))
   ];
+  const onTabPoint = (e) => {
+    const str = e.split('-');
+    setJointIdentify(str);
+    dispatch(setCategory({
+      plus: [],
+      minus: [],
+    }))
+  }
 
   const handleSave = () => {
     if (isjoint) {
       dispatch(setPoint(joint));
       dispatch(setColorData(color));
     }
-    console.log(message);
+    dispatch(setCategory({
+      plus: [],
+      minus: [],
+    }))
     dispatch(setMessageData(message));
     dispatch(setChange(true));
     dispatch(setNodeSettingDlg(false));
+    dispatch(setCategory({
+      plus: [],
+      minus: [],
+    }))
   }
+  useEffect(() => {
+    const newArray = { ...arrayCategory };
+    newArray[jointIdentify[0]] = { ...newArray[jointIdentify[0]] };
+    newArray[jointIdentify[0]][jointIdentify[1]] = category;
+    dispatch(setArrayCategory(newArray));
+  }, [category]);
 
   return (
     <div className='absolute top-[1px] right-0 h-full w-[350px] shadow bg-base-300 select-none'>
@@ -265,7 +304,7 @@ const NodeSettingDialog = () => {
                         </div>
                       </div>
                       <div>
-                        {isjoint && <Tabs defaultActiveKey="right-1"
+                        {isjoint && <Tabs defaultActiveKey="right-1" onChange={onTabPoint}
                           items={jointTabItems}
                         />}
                         <Divider />
@@ -284,11 +323,11 @@ const NodeSettingDialog = () => {
                     <div>
                       <div className="flex justify-between">
                         <h4>件名</h4>
-                        <Input className='w-56' onChange={(e) => setMessage(pre => ({...pre, content1: e.target.value}))} />
+                        <Input className='w-56' onChange={(e) => setMessage(pre => ({ ...pre, content1: e.target.value }))} />
                       </div>
                       <div className="flex justify-between pt-10">
                         <h4>件名</h4>
-                        <TextArea rows={6} className='w-56' onChange={(e) => setMessage(pre => ({...pre, content2: e.target.value}))} />
+                        <TextArea rows={6} className='w-56' onChange={(e) => setMessage(pre => ({ ...pre, content2: e.target.value }))} />
                       </div>
                     </div>
                   ),
@@ -308,13 +347,3 @@ const NodeSettingDialog = () => {
 }
 
 export default NodeSettingDialog;
-
-// export default function () {
-//   return (
-//     <>
-//     <ReactFlowProvider>
-//       <NodeSettingDialog />
-//     </ReactFlowProvider>
-//     </>
-//   );
-// }

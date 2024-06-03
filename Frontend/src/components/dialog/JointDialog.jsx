@@ -6,14 +6,22 @@ import { BiSolidChevronsLeft, BiSolidChevronsRight } from "react-icons/bi";
 import { SearchOutlined, UndoOutlined, FilterOutlined } from '@ant-design/icons';
 import { VscTag } from "react-icons/vsc";
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { setCategory } from "src/redux/slices/NodeSlice";
 const { SubMenu } = Menu;
 
 const JointDialog = ({ open, onOk, onCancel }) => {
-  const [parents, setParents] = useState([]);
+  const dispatch = useDispatch();
+  const [select, setSelect] = useState({});
+  const [allMenuData, setAllMenuData] = useState();
   const [children, setChildren] = useState({});
+  const [menuData, setMenuData] = useState({
+    plus: [],
+    minus: [],
+  });
 
   const getItem = (label, key, type, flag, children) => {
-    return { 
+    return {
       key: key,
       children: children,
       label: (
@@ -29,31 +37,32 @@ const JointDialog = ({ open, onOk, onCancel }) => {
 
   }
   
-  const onSelect = ({ item, key, keyPath, selectedKeys, domEvent }) => {
-    console.log(item);
-    console.log(key);
-    console.log(keyPath);
-    console.log(selectedKeys);
-    console.log(domEvent);
+  const onOkClick = () => {
+    dispatch(setCategory(menuData));
+    onOk();
   }
- 
+
+  const onSelect = (e) => {
+    const temp = allMenuData.filter(item => item._id === e.path[0])
+    setSelect(pre => ({...pre, [e.name]: { name: temp[0].name, type: e.path[1], _id: e.path[0] } }));
+  }
+
   const getCategoryList = async () => {
     try {
+      // const categories = { name: 'Technology', type: 'Blog', icon: 'tech-icon.png' };
+      // const response = await axios.post('/category', categories);
       const response = await axios.get('/category');
       const allData = response.data;
 
       // Filter out parent categories
-      const tempParents = allData.filter(item => item.isParent === true);
-      setParents(tempParents);
+      const tag = allData.filter(item => item.type === 'tag');
+      const list = allData.filter(item => item.type === 'list');
+      const field = allData.filter(item => item.type === 'field');
+      const category = allData.filter(item => item.type === 'category');
+      const data = { tag, list, field, category };
+      setChildren(data);
+      setAllMenuData(allData);
 
-      // Create an object to store children by parentId
-      const tempChildren = {};
-      tempParents.forEach(parent => {
-        tempChildren[parent._id] = allData.filter(item => item.isParent !== true && item.parentId === parent._id);
-      });
-
-      // Set the children state
-      setChildren(tempChildren);
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
@@ -62,7 +71,30 @@ const JointDialog = ({ open, onOk, onCancel }) => {
   useEffect(() => {
     getCategoryList();
   }, [])
-
+  const onSetMenu = (type, method) => {
+    if (type == true && method == true) {
+      const temp = menuData['plus']
+      console.log(menuData);
+      temp.push(select['main'])
+      setMenuData(pre => ({ ...pre, plus: temp }))
+    }
+    if (type == true && method == false) {
+      const temp = menuData['plus']
+      const res = temp.filter(item => item._id !== select['plus']._id);
+      setMenuData(pre => ({ ...pre, plus: res }))
+    }
+    if (type == false && method == true) {
+      const temp = menuData['minus']
+      console.log(menuData);
+      temp.push(select['main'])
+      setMenuData(pre => ({ ...pre, minus: temp }))
+    }
+    if (type == false && method == false) {
+      const temp = menuData['minus']
+      const res = temp.filter(item => item._id !== select['minus']._id);
+      setMenuData(pre => ({ ...pre, minus: res }))
+    }
+  }
   return (
     <Modal className='select-none' centered open={open} onOk={onOk} onCancel={onCancel} footer={false} width={700}>
       <h3 className='text-center pt-5'>ジョイント右２ アクション設定</h3>
@@ -71,208 +103,80 @@ const JointDialog = ({ open, onOk, onCancel }) => {
         <div className='flex gap-10'>
           <div className='w-[300px] border border-base-500'>
             <div className='flex justify-end gap-2 border-t-4 border-blue-500 px-5 py-2'>
-              <button><UndoOutlined className='text-[25px]'/></button>
-              <button><FilterOutlined className='text-[25px]'/></button>
-              <button><SearchOutlined className='text-[25px]'/></button>
+              <button><UndoOutlined className='text-[25px]' /></button>
+              <button><FilterOutlined className='text-[25px]' /></button>
+              <button><SearchOutlined className='text-[25px]' /></button>
             </div>
             <div className='h-[400px] overflow-y-auto no-scrollbar border-t'>
-              <Menu mode='inline' className='select-none' onSelect={onSelect}>
-                {/* {parents.map(item, key => {
-                  <SubMenu key={key} title={
-                    <div className='flex justify-between pr-2'>
-                      <div className='flex items-center gap-2'>
-                        <VscTag className='text-[25px] text-[#08c]'/>
-                        <p>タグ</p>
-                      </div>
-                      <button onClick={addFile}><FaPlusCircle className='text-[25px] text-[#08c]'/></button>
-                    </div>
-                  }>
-
-                  </SubMenu>  
-                })} */}
-                <SubMenu key={'1'} title={
+              <Menu mode='inline' className='select-none' onSelect={(e) => onSelect({ path: e.keyPath, name: 'main' })}>
+                <SubMenu key={'tag'} title={
                   <div className='flex justify-between pr-2'>
                     <div className='flex items-center gap-2'>
-                      <VscTag className='text-[25px] text-[#08c]'/>
+                      <VscTag className='text-[25px] text-[#08c]' />
                       <p>タグ</p>
                     </div>
-                    <button onClick={addFile}><FaPlusCircle className='text-[25px] text-[#08c]'/></button>
+                    <button onClick={addFile}><FaPlusCircle className='text-[25px] text-[#08c]' /></button>
                   </div>
                 }>
-                  <Menu.Item key={'1-1'}>
-                    <div className='flex justify-between pr-2'>
-                      <div className='flex items-center gap-2'>
-                        <LuLink2 className='text-[25px] text-[#08c]'/>
-                        <p>タグAAAA</p>
-                      </div>
-                    </div>
-                  </Menu.Item>
-                  <Menu.Item key={'1-2'}>
-                    <div className='flex justify-between pr-2'>
-                      <div className='flex items-center gap-2'>
-                        <LuLink2 className='text-[25px] text-[#08c]'/>
-                        <p>セミナーA</p>
-                      </div>
-                    </div>
-                  </Menu.Item>
+                  {
+                    children['tag']?.map((item, index) => (
+                      <Menu.Item key={item._id}>
+                        <div className='flex justify-between pr-2'>
+                          <div className='flex items-center gap-2'>
+                            <LuLink2 className='text-[25px] text-[#08c]' />
+                            <p>{item?.name}</p>
+                          </div>
+                        </div>
+                      </Menu.Item>
+                    ))
+                  }
                 </SubMenu>
 
-                <SubMenu key={'2'} title={
+                <SubMenu key={'list'} title={
                   <div className='flex justify-between pr-2'>
                     <div className='flex items-center gap-2'>
-                      <FaListAlt className='text-[25px] text-[#08c]'/>
+                      <FaListAlt className='text-[25px] text-[#08c]' />
                       <p>リスト</p>
                     </div>
-                    <button onClick={addFile}><FaPlusCircle className='text-[25px] text-[#08c]'/></button>
+                    <button onClick={addFile}><FaPlusCircle className='text-[25px] text-[#08c]' /></button>
                   </div>
                 }>
-                  <Menu.Item key={'2-1'}>
-                    <div className='flex justify-between pr-2'>
-                      <div className='flex items-center gap-2'>
-                        <LuLink2 className='text-[25px] text-[#08c]'/>
-                        <p>リストAAAA</p>
-                      </div>
-                    </div>
-                  </Menu.Item>
-                  <Menu.Item key={'2-2'}>
-                    <div className='flex justify-between pr-2'>
-                      <div className='flex items-center gap-2'>
-                        <p className='pl-[32px]'>リストBBBB</p>
-                      </div>
-                    </div>
-                  </Menu.Item>
+                  {
+                    children['list']?.map((item, index) => (
+                      <Menu.Item key={item._id}>
+                        <div className='flex justify-between pr-2'>
+                          <div className='flex items-center gap-2'>
+                            <LuLink2 className='text-[25px] text-[#08c]' />
+                            <p>{item?.name}</p>
+                          </div>
+                        </div>
+                      </Menu.Item>
+                    ))
+                  }
                 </SubMenu>
-                <SubMenu key={'3'} title={
+                <SubMenu key={'field'} title={
                   <div className='flex justify-between pr-2'>
                     <div className='flex items-center gap-2'>
-                      <FaEdit className='text-[25px] text-[#08c]'/>
+                      <FaEdit className='text-[25px] text-[#08c]' />
                       <p>フィールド</p>
                     </div>
-                    <button onClick={addFile}><FaPlusCircle className='text-[25px] text-[#08c]'/></button>
+                    <button onClick={addFile}><FaPlusCircle className='text-[25px] text-[#08c]' /></button>
                   </div>
                 }>
-                  <Menu.Item key={'3-1'}>
-                    <div className='flex justify-between pr-2'>
-                      <div className='flex items-center gap-2'>
-                        <p className='pl-[32px]'>リストBBBB</p>
-                      </div>
-                    </div>
-                  </Menu.Item>
-                  <Menu.Item key={'3-2'}>
-                    <div className='flex justify-between pr-2'>
-                      <div className='flex items-center gap-2'>
-                        <p className='pl-[32px]'>リストBBBB</p>
-                      </div>
-                    </div>
-                  </Menu.Item>
-                  <Menu.Item key={'3-3'}>
-                    <div className='flex justify-between pr-2'>
-                      <div className='flex items-center gap-2'>
-                        <p className='pl-[32px]'>リストBBBB</p>
-                      </div>
-                    </div>
-                  </Menu.Item>
-                  <Menu.Item key={'3-4'}>
-                    <div className='flex justify-between pr-2'>
-                      <div className='flex items-center gap-2'>
-                        <p className='pl-[32px]'>リストBBBB</p>
-                      </div>
-                    </div>
-                  </Menu.Item>
+                  {
+                    children['field']?.map((item, index) => (
+                      <Menu.Item key={item._id}>
+                        <div className='flex justify-between pr-2'>
+                          <div className='flex items-center gap-2'>
+                            <LuLink2 className='text-[25px] text-[#08c]' />
+                            <p>{item?.name}</p>
+                          </div>
+                        </div>
+                      </Menu.Item>
+                    ))
+                  }
                 </SubMenu>
               </Menu>
-              {/* <Menu mode='inline' className='select-none' onSelect={onSelect}>
-                <SubMenu key={'1'} title={
-                  <div className='flex justify-between pr-2'>
-                    <div className='flex items-center gap-2'>
-                      <VscTag className='text-[25px] text-[#08c]'/>
-                      <p>タグ</p>
-                    </div>
-                    <button onClick={addFile}><FaPlusCircle className='text-[25px] text-[#08c]'/></button>
-                  </div>
-                }>
-                  <Menu.Item key={'1-1'}>
-                    <div className='flex justify-between pr-2'>
-                      <div className='flex items-center gap-2'>
-                        <LuLink2 className='text-[25px] text-[#08c]'/>
-                        <p>タグAAAA</p>
-                      </div>
-                    </div>
-                  </Menu.Item>
-                  <Menu.Item key={'1-2'}>
-                    <div className='flex justify-between pr-2'>
-                      <div className='flex items-center gap-2'>
-                        <LuLink2 className='text-[25px] text-[#08c]'/>
-                        <p>セミナーA</p>
-                      </div>
-                    </div>
-                  </Menu.Item>
-                </SubMenu>
-
-                <SubMenu key={'2'} title={
-                  <div className='flex justify-between pr-2'>
-                    <div className='flex items-center gap-2'>
-                      <FaListAlt className='text-[25px] text-[#08c]'/>
-                      <p>リスト</p>
-                    </div>
-                    <button onClick={addFile}><FaPlusCircle className='text-[25px] text-[#08c]'/></button>
-                  </div>
-                }>
-                  <Menu.Item key={'2-1'}>
-                    <div className='flex justify-between pr-2'>
-                      <div className='flex items-center gap-2'>
-                        <LuLink2 className='text-[25px] text-[#08c]'/>
-                        <p>リストAAAA</p>
-                      </div>
-                    </div>
-                  </Menu.Item>
-                  <Menu.Item key={'2-2'}>
-                    <div className='flex justify-between pr-2'>
-                      <div className='flex items-center gap-2'>
-                        <p className='pl-[32px]'>リストBBBB</p>
-                      </div>
-                    </div>
-                  </Menu.Item>
-                </SubMenu>
-                <SubMenu key={'3'} title={
-                  <div className='flex justify-between pr-2'>
-                    <div className='flex items-center gap-2'>
-                      <FaEdit className='text-[25px] text-[#08c]'/>
-                      <p>フィールド</p>
-                    </div>
-                    <button onClick={addFile}><FaPlusCircle className='text-[25px] text-[#08c]'/></button>
-                  </div>
-                }>
-                  <Menu.Item key={'3-1'}>
-                    <div className='flex justify-between pr-2'>
-                      <div className='flex items-center gap-2'>
-                        <p className='pl-[32px]'>リストBBBB</p>
-                      </div>
-                    </div>
-                  </Menu.Item>
-                  <Menu.Item key={'3-2'}>
-                    <div className='flex justify-between pr-2'>
-                      <div className='flex items-center gap-2'>
-                        <p className='pl-[32px]'>リストBBBB</p>
-                      </div>
-                    </div>
-                  </Menu.Item>
-                  <Menu.Item key={'3-3'}>
-                    <div className='flex justify-between pr-2'>
-                      <div className='flex items-center gap-2'>
-                        <p className='pl-[32px]'>リストBBBB</p>
-                      </div>
-                    </div>
-                  </Menu.Item>
-                  <Menu.Item key={'3-4'}>
-                    <div className='flex justify-between pr-2'>
-                      <div className='flex items-center gap-2'>
-                        <p className='pl-[32px]'>リストBBBB</p>
-                      </div>
-                    </div>
-                  </Menu.Item>
-                </SubMenu>
-              </Menu> */}
             </div>
           </div>
 
@@ -280,25 +184,54 @@ const JointDialog = ({ open, onOk, onCancel }) => {
             <p className='pl-[80px] pt-4'>追加アクション</p>
             <div className='flex items-center gap-5'>
               <div className='flex flex-col gap-2'>
-                <Button><BiSolidChevronsRight className='text-[25px] text-[#08c]'/></Button>
-                <Button><BiSolidChevronsLeft className='text-[25px] text-[#08c]'/></Button>
+                <Button onClick={() => onSetMenu(true, true)}><BiSolidChevronsRight className='text-[25px] text-[#08c]' /></Button>
+                <Button onClick={() => onSetMenu(true, false)}><BiSolidChevronsLeft className='text-[25px] text-[#08c]' /></Button>
               </div>
-              <div className='w-full h-40 border border-base-500'></div>
+              <Menu mode='inline' className='select-none w-full h-40 border border-base-500 overflow-y-auto' onSelect={(e) => onSelect({ path: e.keyPath, name: 'plus' })}>
+                {
+                  menuData['plus'].map((item, key) => (
+                    <Menu.Item key={item._id}>
+                      <div className='flex justify-between pr-2'>
+                        <div className='flex items-center gap-2'>
+                          <LuLink2 className='text-[25px] text-[#08c]' />
+                          <p>{item.name}</p>
+                        </div>
+                      </div>
+                    </Menu.Item>
+                  ))
+                }
+              </Menu>
+              {/* <div className='w-full h-40 border border-base-500'>
+
+              </div> */}
             </div>
             <p className='pl-[80px] pt-10'>削減アクション</p>
             <div className='flex items-center gap-5'>
               <div className='flex flex-col gap-2'>
-                <Button><BiSolidChevronsRight className='text-[25px] text-[#08c]'/></Button>
-                <Button><BiSolidChevronsLeft className='text-[25px] text-[#08c]'/></Button>
+                <Button onClick={() => onSetMenu(false, true)}><BiSolidChevronsRight className='text-[25px] text-[#08c]' /></Button>
+                <Button onClick={() => onSetMenu(false, false)}><BiSolidChevronsLeft className='text-[25px] text-[#08c]' /></Button>
               </div>
-              <div className='w-full h-40 border border-base-500'></div>
+              <Menu mode='inline' className='select-none w-full h-40 border border-base-500 overflow-y-auto' onSelect={(e) => onSelect({ path: e.keyPath, name: 'minus' })}>
+                {
+                  menuData['minus'].map((item, key) => (
+                    <Menu.Item key={item._id}>
+                      <div className='flex justify-between pr-2'>
+                        <div className='flex items-center gap-2'>
+                          <LuLink2 className='text-[25px] text-[#08c]' />
+                          <p>{item.name}</p>
+                        </div>
+                      </div>
+                    </Menu.Item>
+                  ))
+                }
+              </Menu>
             </div>
           </div>
         </div>
 
         <div className='flex justify-center gap-24'>
           <Button>キャンセル</Button>
-          <Button type='primary'>保存</Button>
+          <Button onClick={onOkClick} type='primary'>保存</Button>
         </div>
       </div>
     </Modal>
